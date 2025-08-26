@@ -5,7 +5,7 @@ describe("AnimateCSS integration Test", () => {
 	let testConfigFile = "tests/configs/modules/compliments/compliments_animateCSS.js";
 	// define config file to fallback to default: wrong animation name (must return no animation)
 	let testConfigFileFallbackToDefault = "tests/configs/modules/compliments/compliments_animateCSS_fallbackToDefault.js";
-	// define config file with an inversed name animation : in for out and vice versa (must return no animation)
+	// define config file with an inverted name animation : in for out and vice versa (must return no animation)
 	let testConfigFileInvertedAnimationName = "tests/configs/modules/compliments/compliments_animateCSS_invertedAnimationName.js";
 	// define config file with no animation defined
 	let testConfigByDefault = "tests/configs/modules/compliments/compliments_anytime.js";
@@ -23,18 +23,18 @@ describe("AnimateCSS integration Test", () => {
 		let styles = window.getComputedStyle(elem);
 
 		if (animationIn && animationIn !== "") {
-			expect(styles._values["animation-name"]).toBe(animationIn);
+			expect(styles._values.get("animation-name")).toBe(animationIn);
 		} else {
-			expect(styles._values["animation-name"]).toBeUndefined();
+			expect(styles._values.get("animation-name")).toBeUndefined();
 		}
 
 		if (animationOut && animationOut !== "") {
 			elem = await helpers.waitForElement(`.compliments.animate__animated.animate__${animationOut}`);
 			expect(elem).not.toBeNull();
 			styles = window.getComputedStyle(elem);
-			expect(styles._values["animation-name"]).toBe(animationOut);
+			expect(styles._values.get("animation-name")).toBe(animationOut);
 		} else {
-			expect(styles._values["animation-name"]).toBeUndefined();
+			expect(styles._values.get("animation-name")).toBeUndefined();
 		}
 		return true;
 	};

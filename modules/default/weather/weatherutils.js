@@ -30,14 +30,24 @@ const WeatherUtils = {
 		let convertedValue = value;
 		let conversionUnit = valueUnit;
 		if (outputUnit === "imperial") {
-			if (valueUnit && valueUnit.toLowerCase() === "cm") convertedValue = convertedValue * 0.3937007874;
-			else convertedValue = convertedValue * 0.03937007874;
+			convertedValue = this.convertPrecipitationToInch(value, valueUnit);
 			conversionUnit = "in";
 		} else {
 			conversionUnit = valueUnit ? valueUnit : "mm";
 		}
 
 		return `${convertedValue.toFixed(2)} ${conversionUnit}`;
+	},
+
+	/**
+	 * Convert precipitation value into inch
+	 * @param {number} value the precipitation value for convert
+	 * @param {string} valueUnit can be 'mm' or 'cm'
+	 * @returns {number} the converted precipitation value
+	 */
+	convertPrecipitationToInch (value, valueUnit) {
+		if (valueUnit && valueUnit.toLowerCase() === "cm") return value * 0.3937007874;
+		else return value * 0.03937007874;
 	},
 
 	/**
@@ -118,17 +128,39 @@ const WeatherUtils = {
 		} else if (tempInF > 80 && humidity > 40) {
 			feelsLike
 				= -42.379
-				+ 2.04901523 * tempInF
-				+ 10.14333127 * humidity
-				- 0.22475541 * tempInF * humidity
-				- 6.83783 * Math.pow(10, -3) * tempInF * tempInF
-				- 5.481717 * Math.pow(10, -2) * humidity * humidity
-				+ 1.22874 * Math.pow(10, -3) * tempInF * tempInF * humidity
-				+ 8.5282 * Math.pow(10, -4) * tempInF * humidity * humidity
-				- 1.99 * Math.pow(10, -6) * tempInF * tempInF * humidity * humidity;
+				  + 2.04901523 * tempInF
+				  + 10.14333127 * humidity
+				  - 0.22475541 * tempInF * humidity
+				  - 6.83783 * Math.pow(10, -3) * tempInF * tempInF
+				  - 5.481717 * Math.pow(10, -2) * humidity * humidity
+				  + 1.22874 * Math.pow(10, -3) * tempInF * tempInF * humidity
+				  + 8.5282 * Math.pow(10, -4) * tempInF * humidity * humidity
+				  - 1.99 * Math.pow(10, -6) * tempInF * tempInF * humidity * humidity;
 		}
 
 		return ((feelsLike - 32) * 5) / 9;
+	},
+
+	/**
+	 * Converts the Weather Object's values into imperial unit
+	 * @param {object} weatherObject the weather object
+	 * @returns {object} the weather object with converted values to imperial
+	 */
+	convertWeatherObjectToImperial (weatherObject) {
+		if (!weatherObject || Object.keys(weatherObject).length === 0) return null;
+
+		let imperialWeatherObject = { ...weatherObject };
+
+		if (imperialWeatherObject) {
+			if (imperialWeatherObject.feelsLikeTemp) imperialWeatherObject.feelsLikeTemp = this.convertTemp(imperialWeatherObject.feelsLikeTemp, "imperial");
+			if (imperialWeatherObject.maxTemperature) imperialWeatherObject.maxTemperature = this.convertTemp(imperialWeatherObject.maxTemperature, "imperial");
+			if (imperialWeatherObject.minTemperature) imperialWeatherObject.minTemperature = this.convertTemp(imperialWeatherObject.minTemperature, "imperial");
+			if (imperialWeatherObject.precipitationAmount) imperialWeatherObject.precipitationAmount = this.convertPrecipitationToInch(imperialWeatherObject.precipitationAmount, imperialWeatherObject.precipitationUnits);
+			if (imperialWeatherObject.temperature) imperialWeatherObject.temperature = this.convertTemp(imperialWeatherObject.temperature, "imperial");
+			if (imperialWeatherObject.windSpeed) imperialWeatherObject.windSpeed = this.convertWind(imperialWeatherObject.windSpeed, "imperial");
+		}
+
+		return imperialWeatherObject;
 	}
 };
 

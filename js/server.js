@@ -6,10 +6,10 @@ const express = require("express");
 const ipfilter = require("express-ipfilter").IpFilter;
 const helmet = require("helmet");
 const socketio = require("socket.io");
-
 const Log = require("logger");
-const Utils = require("./utils");
-const { cors, getConfig, getHtml, getVersion, getStartup } = require("./server_functions");
+const { cors, getConfig, getHtml, getVersion, getStartup, getEnvVars } = require("./server_functions");
+
+const vendor = require(`${__dirname}/vendor`);
 
 /**
  * Server
@@ -73,9 +73,13 @@ function Server (config) {
 			app.use(helmet(config.httpHeaders));
 			app.use("/js", express.static(__dirname));
 
-			// TODO add tests directory only when running tests?
-			const directories = ["/config", "/css", "/fonts", "/modules", "/vendor", "/translations", "/tests/configs", "/tests/mocks"];
-			for (const directory of directories) {
+			let directories = ["/config", "/css", "/modules", "/node_modules/animate.css", "/node_modules/@fontsource", "/node_modules/@fortawesome", "/translations", "/tests/configs", "/tests/mocks"];
+			for (const [key, value] of Object.entries(vendor)) {
+				const dirArr = value.split("/");
+				if (dirArr[0] === "node_modules") directories.push(`/${dirArr[0]}/${dirArr[1]}`);
+			}
+			const uniqDirs = [...new Set(directories)];
+			for (const directory of uniqDirs) {
 				app.use(directory, express.static(path.resolve(global.root_path + directory)));
 			}
 
@@ -86,6 +90,8 @@ function Server (config) {
 			app.get("/config", (req, res) => getConfig(req, res));
 
 			app.get("/startup", (req, res) => getStartup(req, res));
+
+			app.get("/env", (req, res) => getEnvVars(req, res));
 
 			app.get("/", (req, res) => getHtml(req, res));
 

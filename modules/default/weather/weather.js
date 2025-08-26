@@ -14,7 +14,8 @@ Module.register("weather", {
 		updateInterval: 10 * 60 * 1000, // every 10 minutes
 		animationSpeed: 1000,
 		showFeelsLike: true,
-		showHumidity: "none", // this is now a string; see current.njk
+		showHumidity: "none", // possible options for "current" weather are "none", "wind", "temp", "feelslike" or "below", for "hourly" weather "none" or "true"
+		hideZeroes: false, // hide zeroes (and empty columns) in hourly, currently only for precipitation
 		showIndoorHumidity: false,
 		showIndoorTemperature: false,
 		allowOverrideNotification: false,
@@ -170,12 +171,19 @@ Module.register("weather", {
 		}
 
 		const notificationPayload = {
-			currentWeather: this.weatherProvider?.currentWeatherObject?.simpleClone() ?? null,
-			forecastArray: this.weatherProvider?.weatherForecastArray?.map((ar) => ar.simpleClone()) ?? [],
-			hourlyArray: this.weatherProvider?.weatherHourlyArray?.map((ar) => ar.simpleClone()) ?? [],
+			currentWeather: this.config.units === "imperial"
+				? WeatherUtils.convertWeatherObjectToImperial(this.weatherProvider?.currentWeatherObject?.simpleClone()) ?? null
+				: this.weatherProvider?.currentWeatherObject?.simpleClone() ?? null,
+			forecastArray: this.config.units === "imperial"
+				? this.weatherProvider?.weatherForecastArray?.map((ar) => WeatherUtils.convertWeatherObjectToImperial(ar.simpleClone())) ?? []
+				: this.weatherProvider?.weatherForecastArray?.map((ar) => ar.simpleClone()) ?? [],
+			hourlyArray: this.config.units === "imperial"
+				? this.weatherProvider?.weatherHourlyArray?.map((ar) => WeatherUtils.convertWeatherObjectToImperial(ar.simpleClone())) ?? []
+				: this.weatherProvider?.weatherHourlyArray?.map((ar) => ar.simpleClone()) ?? [],
 			locationName: this.weatherProvider?.fetchedLocationName,
 			providerName: this.weatherProvider.providerName
 		};
+
 		this.sendNotification("WEATHER_UPDATED", notificationPayload);
 	},
 

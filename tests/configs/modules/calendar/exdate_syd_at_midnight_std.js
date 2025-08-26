@@ -1,4 +1,5 @@
-/* MagicMirror² Test calendar exdate
+/*
+ * MagicMirror² Test calendar exdate
  *
  * By jkriegshauser
  * MIT Licensed.
@@ -7,6 +8,8 @@
  * See tests/electron/modules/calendar_spec.js
  */
 let config = {
+	address: "0.0.0.0",
+	ipWhitelist: [],
 	timeFormat: 12,
 
 	modules: [
@@ -25,10 +28,6 @@ let config = {
 			}
 		}
 	]
-};
-
-Date.now = () => {
-	return new Date("14 Sep 2023 12:30:00 GMT+10:00").valueOf();
 };
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/

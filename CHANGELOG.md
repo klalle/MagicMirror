@@ -1,15 +1,226 @@
-# MagicMirror² Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](https://semver.org/).
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ❤️ **Donate:** Enjoying MagicMirror²? [Please consider a donation!](https://magicmirror.builders/#donate) With your help we can continue to improve the MagicMirror².
+
+## [2.32.0] - 2025-07-01
+
+Thanks to: @bughaver, @bugsounet, @khassel, @KristjanESPERANTO, @plebcity, @rejas, @sdetweil.
+
+> ⚠️ This release needs nodejs version `v22.14.0 or higher`
+
+### Added
+
+- [config] Allow to change module order for final renderer (or dynamically with CSS): Feature `order` in config (#3762)
+- [clock] Added option 'disableNextEvent' to hide next sun event (#3769)
+- [clock] Implement short syntax for clock week (#3775)
+
+### Changed
+
+- [refactor] Simplify module loading process (#3766)
+- Use `node --run` instead of `npm run` (#3764) and adapt `start:dev` script (#3773)
+- [workflow] Run linter and spellcheck with LTS node version (#3767)
+- [workflow] Split "Run test" step into two steps for more clarity (#3767)
+- [linter] Review linter setup (#3783)
+  - Fix command to lint markdown in `CONTRIBUTING.md`
+  - Re-activate JSDoc linting and fix linting issues
+  - Refactor ESLint config to use `defineConfig` and `globalIgnores`
+  - Replace `eslint-plugin-import` with `eslint-plugin-import-x`
+  - Switch Stylelint config to flat format and simplify Stylelint scripts
+- [workflow] Replace Node.js version v23 with v24 (#3770)
+- [refactor] Replace deprecated constants `fs.F_OK` and `fs.R_OK` (#3789)
+- [refactor] Replace `ansis` with built-in function `util.styleText` (#3793)
+- [core] Integrate stuff from `vendor` and `fonts` folders into main `package.json`, simplifies install and maintaining dependencies (#3795, #3805)
+- [l10n] Complete translations (with the help of translation tools) (#3794)
+- [refactor] Refactored `calendarfetcherutils` in Calendar module to handle timezones better (#3806)
+  - Removed as many of the date conversions as possible
+  - Use `moment-timezone` when calculating recurring events, this will fix problems from the past with offsets and DST not being handled properly
+  - Added some tests to test the behavior of the refactored methods to make sure the correct event dates are returned
+- [linter] Enable ESLint rule `no-console` and replace `console` with `Log` in some files (#3810)
+- [tests] Review and refactor translation tests (#3792)
+
+### Fixed
+
+- [fix] Handle spellcheck issues (#3783)
+- [calendar] fix fullday event rrule until with timezone offset (#3781)
+- [feat] Add rule `no-undef` in config file validation to fix #3785 (#3786)
+- [fonts] Fix `roboto.css` to avoid error message `Unknown descriptor 'var(' in @font-face rule.` in firefox console (#3787)
+- [tests] Fix and refactor e2e test `Same keys` in `translations_spec.js` (#3809)
+- [tests] Fix e2e tests newsfeed and calendar to exit without open handles (#3817)
+
+### Updated
+
+- [core] Update dependencies including electron to v36 (#3774, #3788, #3811, #3804, #3815, #3823)
+- [core] Update package type to `commonjs`
+- [logger] Review factory code part: use `switch/case` instead of `if/else if` (#3812)
+
+## [2.31.0] - 2025-04-01
+
+Thanks to: @Developer-Incoming, @eltociear, @geraki, @khassel, @KristjanESPERANTO, @MagMar94, @mixasgr, @n8many, @OWL4C, @rejas, @savvadam, @sdetweil.
+
+> ⚠️ This release needs nodejs version `v22.14.0 or higher`
+
+### Added
+
+- Add CSS support to the digital clock hour/minute/second through the use of the classes `clock-hour-digital`, `clock-minute-digital`, and `clock-second-digital`.
+- Add Arabic (#3719) and Esperanto translation (#3740)
+- Mark option `secondsColor` as deprecated in clock module.
+- Add Greek translation to Alerts module.
+- [newsfeed] Add specific ignoreOlderThan value (override) per feed (#3360)
+- [weather] Added option Humidity to hourly View
+- [weather] Added option to hide hourly entries that are Zero, hiding the entire column if empty.
+- [updatenotification] Added option to iterate over modules directory instead using modules defined in `config.js` (#3739)
+
+### Changed
+
+- [core] Starting clientonly now checks for needed env var `WAYLAND_DISPLAY` or `DISPLAY` and starts electron with needed parameters (if both are set Wayland is used) (#3677)
+- [core] Optimize systeminformation calls and output (#3689)
+- [core] Add issue templates for feature requests and bug reports (#3695)
+- [core] Adapt `start:x11:dev` script
+- [weather/yr] The Yr weather provider now enforces a minimum `updateInterval` of 600 000 ms (10 minutes) to comply with the terms of service. If a lower value is set, it will be automatically increased to this minimum.
+- [weather/weatherflow] Fixed icons and added hourly support as well as UV, precipitation, and location name support.
+- [workflow] Run `sudo apt-get update` before installing packages to avoid install errors
+- [workflow] Exclude issues with label `ready (coming with next release)` from stale job
+
+### Removed
+
+### Updated
+
+- [core] Update requirements and dependencies including electron to v35 and formatting (#3593, #3693, #3717)
+- [core] Update prettier, ESLint and simplify config
+- Update Greek translation
+
+### Fixed
+
+- [calendar] Fix clipping events being broadcast (#3678)
+- [tests] Fix Electron tests by running them under new github image ubuntu-24.04, replace xserver with labwc, running under xserver and labwc depending on env variable WAYLAND_DISPLAY is set (#3676)
+- [calendar] Fix arrayed symbols, #3267, again, add testcase, add testcase for #3678
+- [weather] Fix wrong weatherCondition name in openmeteo provider which lead to n/a icon (#3691)
+- [core] Fix wrong port in log message when starting server only (#3696)
+- [calendar] Fix NewYork event processed on system in Central timezone shows wrong time #3701
+- [weather/yr] The Yr weather provider is now able to recover from bad API responses instead of freezing (#3296)
+- [compliments] Fix evening events being shown during the day (#3727)
+- [weather] Fixed minor spacing issues when using UV Index in Hourly
+- [workflow] Fix command to run spellcheck
+
+## [2.30.0] - 2025-01-01
+
+Thanks to: @xsorifc28, @HeikoGr, @bugsounet, @khassel, @KristjanESPERANTO, @rejas, @sdetweil.
+
+> ⚠️ This release needs nodejs version `v20` or `v22 or higher`, minimum version is `v20.18.1`
+
+### Added
+
+- [core] Add Wayland and Windows start options to `package.json` (#3594)
+- [docs] Add step for npm publishing in release process (#3595)
+- [core] Add GitHub workflow to run spellcheck a few days before each release (#3623)
+- [core] Add test flag to `index.html` to pass to module js for test mode detection (needed by #3630)
+- [core] Add export on animation names (#3644)
+- [compliments] Add support for refreshing remote compliments file, and test cases (#3630)
+- [linter] Re-add `eslint-plugin-import`now that it supports ESLint v9 (#3586)
+- [linter] Re-activate `eslint-plugin-package-json` to lint `package.json` (#3643)
+- [linter] Add linting for markdown files (#3646)
+- [linter] Add some handy ESLint rules (#3665)
+- [calendar] Add ability to display end date for full date events, where end is not same day (showEnd=true) (#3650)
+- [core] Add text to the config.js.sample file about the locale variable (#3654, #3655)
+- [core] Add fetch timeout for all node_helpers (thru undici, forces node 20.18.1 minimum) to help on slower systems. (#3660) (3661)
+
+### Changed
+
+- [core] Run code style checks in workflow only once (#3648)
+- [core] Fix animations export #3644 only on server side (#3649)
+- [core] Use project URL in fallback config (#3656)
+- [core] Fix Access Denied crash writing js/positions.js (on synology nas) #3651. new message, MM starts, but no modules showing (#3652)
+- [linter] Switch to 'npx' for lint-staged in pre-commit hook (#3658)
+
+### Removed
+
+- [tests] Remove `node-pty` and `drivelist` from rebuilded test (#3575)
+- [deps] Remove `@eslint/js` dependency. Already installed with `eslint` in deep (#3636)
+
+### Updated
+
+- [repo] Reactivate `stale.yaml` as GitHub action to mark issues as stale after 60 days and close them 7 days later (if no activity) (#3577, #3580, #3581)
+- [core] Update electron dependency to v32 (test electron rebuild) and all other dependencies too (#3657)
+- [tests] All test configs have been updated to allow full external access, allowing for easier debugging (especially when running as a container)
+- [core] Run and test with node 23 (#3588)
+- [workflow] delete exception `allow-ghsas: GHSA-8hc4-vh64-cxmj` in `dep-review.yaml` (#3659)
+
+### Fixed
+
+- [updatenotification] Fix pm2 using detection when pm2 script is inside or outside MagicMirror root folder (#3576) (#3605) (#3626) (#3628)
+- [core] Fix loading node_helper of modules: avoid black screen, display errors and continue loading with next module (#3578)
+- [weather] Change default value for weatherEndpoint of provider openweathermap to "/onecall" (#3574)
+- [tests] Fix electron tests with mock dates, the mock on server side was missing (#3597)
+- [tests] Fix testcases with hard coded Date.now (#3597)
+- [core] Fix missing `basePath` where `location.host` is used (#3613)
+- [compliments] croner library changed filenames used in latest version (#3624)
+- [linter] Fix ESLint ignore pattern which caused that default modules not to be linted (#3632)
+- [core] Fix module path in case of sub/sub folder is used and use path.resolve for resolve `moduleFolder` and `defaultModuleFolder` in app.js (#3653)
+- [calendar] Update to resolve issues #3098 #3144 #3351 #3422 #3443 #3467 #3537 related to timezone changes
+- [calendar] Fix #3267 (styles array), also fixes event with both exdate AND recurrence(and testcase)
+- [calendar] Fix showEndsOnlyWithDuration not working, #3598, applies ONLY to full day events
+- [calendar] Fix showEnd for Full Day events (#3602)
+- [tests] Suppress "module is not defined" in e2e tests (#3647)
+- [calendar] Fix #3267 (styles array, really this time!)
+- [core] Fix #3662 js/positions.js created incorrectly
+
+## [2.29.0] - 2024-10-01
+
+Thanks to: @bugsounet, @dkallen78, @jargordon, @khassel, @KristjanESPERANTO, @MarcLandis, @rejas, @ryan-d-williams, @sdetweil, @skpanagiotis.
+
+> ⚠️ This release needs nodejs version `v20` or `v22`, minimum version is `v20.9.0`
+
+### Added
+
+- [compliments] Added support for cron type date/time format entries mm hh DD MM dow (minutes/hours/days/months and day of week) see <https://crontab.cronhub.io> for construction (#3481)
+- [core] Check config at every start of MagicMirror² (#3450)
+- [core] Add spelling check (cspell): `npm run test:spelling` and handle spelling issues (#3544)
+- [core] removed `config.paths.vendor` (could not work because `vendor` is hardcoded in `index.html`), renamed `config.paths.modules` to `config.foreignModulesDir`, added variable `MM_CUSTOMCSS_FILE` which - if set - overrides `config.customCss`, added variable `MM_MODULES_DIR` which - if set - overrides `config.foreignModulesDir`, added test for `MM_MODULES_DIR` (#3530)
+- [core] elements are now removed from `index.html` when loading script or stylesheet files fails
+- [core] Added `MODULE_DOM_UPDATED` notification each time the DOM is re-rendered via `updateDom` (#3534)
+- [tests] added minimal needed node version to tests (currently v20.9.0) to avoid releases with wrong node version info
+- [tests] Added `node-libgpiod` library to electron-rebuild tests (#3563)
+
+### Removed
+
+- [core] removed installer only files (#3492)
+- [core] removed raspberry object from systeminformation (#3505)
+- [linter] removed `eslint-plugin-import`, because it doesn't support ESLint v9. We will reenter it later when it does.
+- [tests] removed `onoff` library from electron-rebuild tests (#3563)
+
+### Updated
+
+- [weather] Updated `apiVersion` default from 2.5 to 3.0 (#3424)
+- [core] Updated dependencies including stylistic-eslint
+- [core] nail down `node-ical` version to `0.18.0` with exception `allow-ghsas: GHSA-8hc4-vh64-cxmj` in `dep-review.yaml` (which should removed after next `node-ical` update)
+- [core] Updated SocketIO catch all to new API
+- [core] Allow custom modules positions by scanning index.html for the defined regions, instead of hard coded (PR #3518 fixes issue #3504)
+- [core] Detail optimizations in `config_check.js`
+- [core] Updated minimal needed node version in `package.json` (currently v20.9.0) (#3559) and except for v21 (no security updates) (#3561)
+- [linter] Switch to ESLint v9 and flat config and replace `eslint-plugin-unicorn` by `@eslint/js`
+- [core] Fix discovering module positions twice after #3450
+
+### Fixed
+
+- [docs] Fixed `checks` badge in README.md
+- [weather] Fixed issue with the UK Met Office provider following a change in their API paths and header info.
+- [core] Add check for node_helper loading for multiple instances of same module (#3502)
+- [weather] Fixed issue for respecting unit config on broadcasted notifications
+- [tests] Fixes calendar test by moving it from e2e to electron with fixed date (#3532)
+- [calendar] fixed sliceMultiDayEvents getting wrong count and displaying incorrect entries, Europe/Berlin (#3542)
+- [tests] ignore `js/positions.js` when linting (this file is created at runtime)
+- [calendar] fixed sliceMultiDayEvents showing previous day without config enabled
 
 ## [2.28.0] - 2024-07-01
 
 Thanks to: @btoconnor, @bugsounet, @JasonStieber, @khassel, @kleinmantara and @WallysWellies.
 
-> ⚠️ This release needs nodejs version >= v20
+> ⚠️ This release needs nodejs version >= v20.9.0
 
 ### Added
 
@@ -31,7 +242,7 @@ Thanks to: @btoconnor, @bugsounet, @JasonStieber, @khassel, @kleinmantara and @W
 
 ### Fixed
 
-- [core] Fixed crash possibility if `module: <name>` is not defined and on `postion: <positon>` mistake (#3445)
+- [core] Fixed crash possibility if `module: <name>` is not defined and on `position: <position>` mistake (#3445)
 - [weather] Fixed precipitationProbability in forecast for provider openmeteo (#3446)
 - [weather] Fixed type=daily for provider openmeteo having no data when running after 23:00 (#3449)
 - [weather] Fixed type=daily for provider openmeteo showing nightly icons in forecast when current time is "nightly" (#3458)
@@ -56,7 +267,7 @@ For more info, please read the following post: [A New Chapter for MagicMirror: T
 
 ### Updated
 
-- Update updatenotification (update_helper.js): Recode with pm2 library (#3332)
+- [updatenotification] Recode update_helper.js with pm2 library (#3332)
 - Removing lodash dependency by replacing merge by spread operator (#3339)
 - Use node prefix for build-in modules (#3340)
 - Rework logging colors (#3350)
@@ -70,7 +281,7 @@ For more info, please read the following post: [A New Chapter for MagicMirror: T
 
 ### Fixed
 
-- Correct apibase of weathergov weatherprovider to match documentation (#2926)
+- [weather] Correct apiBase of weathergov weatherProvider to match documentation (#2926)
 - Worked around several issues in the RRULE library that were causing deleted calender events to still show, some
   initial and recurring events to not show, and some event times to be off an hour. (#3291)
 - Skip changelog requirement when running tests for dependency updates (#3320)
@@ -136,8 +347,8 @@ This release also marks the latest release by Michael Teeuw. For more info, plea
 - Fix issue template (#3167)
 - Fix #3256 filter out bad results from rrule.between
 - Fix calendar events sometimes not respecting deleted events (#3250)
-- Fix electron loadurl locally on Windows when address "0.0.0.0" (#2550)
-- Fix updatanotification (update_helper.js): catch error if response is not an JSON format (check PM2)
+- Fix electron loadURL locally on Windows when address "0.0.0.0" (#2550)
+- Fix updatenotification (update_helper.js): catch error if response is not an JSON format (check PM2)
 - Fix missing typeof in calendar module
 - Fix style issues after prettier update
 - Fix calendar test (#3291) by moving "Exdate check" from e2e to electron to run on a Thursday
@@ -222,7 +433,7 @@ Special thanks to @khassel, @rejas and @sdetweil for taking over most (if not al
 
 ### Updated
 
-- Added support for precipitation probability with openmeteo weather-provider
+- [weather] Added support for precipitation probability with openmeteo weather-provider
 - Update electron to v25.2 and other dependencies
 - Use node v20 in github workflow (replacing v14)
 - Refactor formatTime into common util function for default modules
@@ -395,7 +606,7 @@ Special thanks to the following contributors: @eouia, @khassel, @kolbyjack, @Kri
 
 ### Added
 
-- Added a new config option `httpHeaders` used by helmet (see https://helmetjs.github.io/). You can now set own httpHeaders which will override the defaults in `js/defauls.js` which is useful e.g. if you want to embed MagicMirror into annother website (solves #2847).
+- Added a new config option `httpHeaders` used by helmet (see <https://helmetjs.github.io/>). You can now set own httpHeaders which will override the defaults in `js/defaults.js` which is useful e.g. if you want to embed MagicMirror into another website (solves #2847).
 - Show endDate for calendar events when dateHeader is enabled and showEnd is set to true (#2192).
 - Added the notification emitting from the weather module on information updated.
 - Use recommended file extension for YAML files (#2864).
@@ -444,7 +655,7 @@ Special thanks to the following contributors: @10bias, @CFenner, @JHWelch, @k1rd
 - Fix minor console output issue for loading translations (#2814).
 - Don't adjust startDate for full day events if endDate is in the past.
 - Fix windspeed conversion error in openweathermap provider. (#2812)
-- Fix conflicting parms turning off showEnd for full day events. (#2629)
+- Fix conflicting parameter turning off showEnd for full day events. (#2629)
 - Fix regression, calendar.maximumEntries not used to filter calendar level entries (#2868)
 
 ## [2.18.0] - 2022-01-01
@@ -476,7 +687,7 @@ Special thanks to the following contributors: @AmpioRosso, @eouia, @fewieden, @j
 ### Fixed
 
 - Fixed wrong file `kr.json` to `ko.json`. Use language code 'ko' instead of 'kr' for Korean language.
-- Fixed `feels_like` data from openweathermaps current weather being ignored (#2678).
+- Fixed `feels_like` data from openweathermap's current weather being ignored (#2678).
 - Fixed chaotic newsfeed display after network connection loss thanks to @jalibu (#2638).
 - Fixed incorrect time zone correction of recurring full day events (#2632 and #2634).
 - Fixed e2e tests by increasing testTimeout.
@@ -513,7 +724,7 @@ Special thanks to the following contributors: @apiontek, @eouia, @jupadin, @khas
 - Updated github templates.
 - Actually test all js and css files when lint script is run.
 - Updated jsdocs and print warnings during testing too.
-- Updated weathergov provider to try fetching not just current, but also foreacst, when API URLs available.
+- Updated weathergov provider to try fetching not just current, but also forecast, when API URLs available.
 - Refactored clock layout.
 - Refactored methods from weather-providers into weatherobject (isDaytime, updateSunTime).
 - Use of `logger.js` in jest tests.
@@ -863,7 +1074,7 @@ Special thanks to @sdetweil for all his great contributions!
 ### Updated
 
 - Updated lower bound of `lodash` and `helmet` dependencies for security patches.
-- Updated compliments.js to handle newline in text, as textfields to not interpolate contents.
+- Updated compliments.js to handle newline in text, as text fields to not interpolate contents.
 - Updated raspberry.sh installer script to handle new platform issues, split node/npm, pm2, and screen saver changes.
 - Improve handling for armv6l devices, where electron support has gone away, add optional serveronly config option.
 - Improved run-start.sh to handle for serveronly mode, by choice, or when electron not available.
@@ -1084,7 +1295,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 - Fixed close dates to be absolute, if no configured in the config.js - module Calendar
 - Fixed the updatenotification module message about new commits in the repository, so they can be correctly localized in singular and plural form.
 - Fix for weatherforecast rainfall rounding [#1374](https://github.com/MagicMirrorOrg/MagicMirror/issues/1374)
-- Fix calendar parsing issue for Midori on RasperryPi Zero w, related to issue #694.
+- Fix calendar parsing issue for Midori on Raspberry Pi Zero w, related to issue #694.
 - Fix weather city ID link in sample config
 - Fixed issue with clientonly not updating with IP address and port provided on command line.
 
@@ -1139,7 +1350,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 - Fixed weatherforecast to use dt_txt field instead of dt to handle timezones better
 - Newsfeed now remembers to show the description when `"ARTICLE_LESS_DETAILS"` is called if the user wants to always show the description. [#1282](https://github.com/MagicMirrorOrg/MagicMirror/issues/1282)
 - `clientonly/*.js` is now linted, and one linting error is fixed
-- Fix issue #1196 by changing underscore to hyphen in locale id, in align with momentjs.
+- Fix issue #1196 by changing underscore to hyphen in locale id, in align with moment.js.
 - Fixed issue where heat index and wind chill were reporting incorrect values in Kelvin. [#1263](https://github.com/MagicMirrorOrg/MagicMirror/issues/1263)
 
 ### Updated
@@ -1164,7 +1375,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 - Implement Danger.js to notify contributors when CHANGELOG.md is missing in PR.
 - Allow scrolling in full page article view of default newsfeed module with gesture events from [MMM-Gestures](https://github.com/thobach/MMM-Gestures)
 - Changed 'compliments.js' - Updated DOM if remote compliments are loaded instead of waiting one updateInterval to show custom compliments
-- Automated unit tests utils, deprecated, translator, cloneObject(lockstrings)
+- Automated unit tests utils, deprecated, translator, cloneObject(lockStrings)
 - Automated integration tests translations
 - Add advanced filtering to the excludedEvents configuration of the default calendar module
 - New currentweather module config option: `showFeelsLike`: Shows how it actually feels like. (wind chill or heat index)
@@ -1268,7 +1479,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 ### Fixed
 
 - Fixed issue with incorrect alignment of analog clock when displayed in the center column of the MM.
-- Fixed ipWhitelist behaviour to make empty whitelist ([]) allow any and all hosts access to the MM.
+- Fixed ipWhitelist behavior to make empty whitelist ([]) allow any and all hosts access to the MM.
 - Fixed issue with calendar module where 'excludedEvents' count towards 'maximumEntries'.
 - Fixed issue with calendar module where global configuration of maximumEntries was not overridden by calendar specific config (see module doc).
 - Fixed issue where `this.file(filename)` returns a path with two hashes.
@@ -1310,7 +1521,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 ### Fixed
 
 - Fix instruction in README for using automatically installer script.
-- Bug of duplicated compliments as described in [here](https://forum.magicmirror.builders/topic/2381/compliments-module-stops-cycling-compliments).
+- Bug of [duplicated compliments](https://forum.magicmirror.builders/topic/2381/compliments-module-stops-cycling-compliments).
 - Fix double message about port when server is starting
 - Corrected Swedish translations for TODAY/TOMORROW/DAYAFTERTOMORROW.
 - Removed unused import from js/electron.js
@@ -1373,7 +1584,7 @@ A huge, huge, huge thanks to user @fewieden for all his hard work on the new `we
 - Added multiple calendar icon support.
 - Added tests for Translations, dev argument, version, dev console.
 - Added test anytime feature compliments module.
-- Added test ipwhitelist configuration directive.
+- Added test ipWhitelist configuration directive.
 - Added test for calendar module: default, basic-auth, backward compatibility, fail-basic-auth.
 - Added meta tags to support fullscreen mode on iOS (for server mode)
 - Added `ignoreOldItems` and `ignoreOlderThan` options to the News Feed module
@@ -1559,3 +1770,52 @@ It includes (but is not limited to) the following features:
 ### Initial release of MagicMirror
 
 This was part of the blogpost: [https://michaelteeuw.nl/post/83916869600/magic-mirror-part-vi-production-of-the](https://michaelteeuw.nl/post/83916869600/magic-mirror-part-vi-production-of-the)
+
+[2.32.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.31.0...v2.32.0
+[2.31.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.30.0...v2.31.0
+[2.30.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.29.0...v2.30.0
+[2.29.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.28.0...v2.29.0
+[2.28.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.27.0...v2.28.0
+[2.27.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.26.0...v2.27.0
+[2.26.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.25.0...v2.26.0
+[2.25.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.24.0...v2.25.0
+[2.24.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.23.0...v2.24.0
+[2.23.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.22.0...v2.23.0
+[2.22.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.21.0...v2.22.0
+[2.21.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.20.0...v2.21.0
+[2.20.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.19.0...v2.20.0
+[2.19.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.18.0...v2.19.0
+[2.18.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.17.1...v2.18.0
+[2.17.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.17.0...v2.17.1
+[2.17.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.16.0...v2.17.0
+[2.16.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.15.0...v2.16.0
+[2.15.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.14.0...v2.15.0
+[2.14.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.13.0...v2.14.0
+[2.13.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.12.0...v2.13.0
+[2.12.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.11.0...v2.12.0
+[2.11.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.10.1...v2.11.0
+[2.10.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.10.0...v2.10.1
+[2.10.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.9.0...v2.10.0
+[2.9.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.8.0...v2.9.0
+[2.8.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.7.1...v2.8.0
+[2.7.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.7.0...v2.7.1
+[2.7.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.6.0...v2.7.0
+[2.6.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.4.1...v2.5.0
+[2.4.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.4.0...v2.4.1
+[2.4.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.3.1...v2.4.0
+[2.3.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.2.2...v2.3.0
+[2.2.2]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.2.1...v2.2.2
+[2.2.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.2.0...v2.2.1
+[2.2.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.1.3...v2.2.0
+[2.1.3]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.1.2...v2.1.3
+[2.1.2]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.1.1...v2.1.2
+[2.1.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.1.0...v2.1.1
+[2.1.0]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.5...v2.1.0
+[2.0.5]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.4...v2.0.5
+[2.0.4]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.2...v2.0.3
+[2.0.2]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/MagicMirrorOrg/MagicMirror/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/MagicMirrorOrg/MagicMirror/releases/tag/v2.0.0

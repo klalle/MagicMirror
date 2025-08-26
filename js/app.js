@@ -9,9 +9,16 @@ const Log = require("logger");
 const Server = require(`${__dirname}/server`);
 const Utils = require(`${__dirname}/utils`);
 const defaultModules = require(`${__dirname}/../modules/default/defaultmodules`);
+const { getEnvVarsAsObj } = require(`${__dirname}/server_functions`);
+
+// used to control fetch timeout for node_helpers
+const { setGlobalDispatcher, Agent } = require("undici");
+// common timeout value, provide environment override in case
+const fetch_timeout = process.env.mmFetchTimeout !== undefined ? process.env.mmFetchTimeout : 30000;
 
 // Get version number.
 global.version = require(`${__dirname}/../package.json`).version;
+global.mmTestMode = process.env.mmTestMode === "true";
 Log.log(`Starting MagicMirror: v${global.version}`);
 
 // Log system information.
@@ -70,7 +77,7 @@ function App () {
 
 		// check if templateFile exists
 		try {
-			fs.accessSync(templateFile, fs.F_OK);
+			fs.accessSync(templateFile, fs.constants.F_OK);
 		} catch (err) {
 			templateFile = null;
 			Log.log("config template file not exists, no envsubst");
@@ -116,8 +123,10 @@ function App () {
 			}
 		}
 
+		require(`${global.root_path}/js/check_config.js`);
+
 		try {
-			fs.accessSync(configFilename, fs.F_OK);
+			fs.accessSync(configFilename, fs.constants.F_OK);
 			const c = require(configFilename);
 			if (Object.keys(c).length === 0) {
 				Log.error("WARNING! Config file appears empty, maybe missing module.exports last line?");
@@ -144,11 +153,23 @@ function App () {
 	 */
 	function checkDeprecatedOptions (userConfig) {
 		const deprecated = require(`${global.root_path}/js/deprecated`);
-		const deprecatedOptions = deprecated.configs;
 
+		// check for deprecated core options
+		const deprecatedOptions = deprecated.configs;
 		const usedDeprecated = deprecatedOptions.filter((option) => userConfig.hasOwnProperty(option));
 		if (usedDeprecated.length > 0) {
-			Log.warn(`WARNING! Your config is using deprecated options: ${usedDeprecated.join(", ")}. Check README and CHANGELOG for more up-to-date ways of getting the same functionality.`);
+			Log.warn(`WARNING! Your config is using deprecated option(s): ${usedDeprecated.join(", ")}. Check README and CHANGELOG for more up-to-date ways of getting the same functionality.`);
+		}
+
+		// check for deprecated module options
+		for (const element of userConfig.modules) {
+			if (deprecated[element.module] !== undefined && element.config !== undefined) {
+				const deprecatedModuleOptions = deprecated[element.module];
+				const usedDeprecatedModuleOptions = deprecatedModuleOptions.filter((option) => element.config.hasOwnProperty(option));
+				if (usedDeprecatedModuleOptions.length > 0) {
+					Log.warn(`WARNING! Your config for module ${element.module} is using deprecated option(s): ${usedDeprecatedModuleOptions.join(", ")}. Check README and CHANGELOG for more up-to-date ways of getting the same functionality.`);
+				}
+			}
 		}
 	}
 
@@ -159,16 +180,25 @@ function App () {
 	function loadModule (module) {
 		const elements = module.split("/");
 		const moduleName = elements[elements.length - 1];
-		let moduleFolder = `${__dirname}/../modules/${module}`;
+		const env = getEnvVarsAsObj();
+		let moduleFolder = path.resolve(`${__dirname}/../${env.modulesDir}`, module);
 
 		if (defaultModules.includes(moduleName)) {
-			moduleFolder = `${__dirname}/../modules/default/${module}`;
+			const defaultModuleFolder = path.resolve(`${__dirname}/../modules/default/`, module);
+			if (process.env.JEST_WORKER_ID === undefined) {
+				moduleFolder = defaultModuleFolder;
+			} else {
+				// running in Jest, allow defaultModules placed under moduleDir for testing
+				if (env.modulesDir === "modules" || env.modulesDir === "tests/mocks") {
+					moduleFolder = defaultModuleFolder;
+				}
+			}
 		}
 
-		const moduleFile = `${moduleFolder}/${module}.js`;
+		const moduleFile = `${moduleFolder}/${moduleName}.js`;
 
 		try {
-			fs.accessSync(moduleFile, fs.R_OK);
+			fs.accessSync(moduleFile, fs.constants.R_OK);
 		} catch (e) {
 			Log.warn(`No ${moduleFile} found for module: ${moduleName}.`);
 		}
@@ -177,14 +207,21 @@ function App () {
 
 		let loadHelper = true;
 		try {
-			fs.accessSync(helperPath, fs.R_OK);
+			fs.accessSync(helperPath, fs.constants.R_OK);
 		} catch (e) {
 			loadHelper = false;
 			Log.log(`No helper found for module: ${moduleName}.`);
 		}
 
+		// if the helper was found
 		if (loadHelper) {
-			const Module = require(helperPath);
+			let Module;
+			try {
+				Module = require(helperPath);
+			} catch (e) {
+				Log.error(`Error when loading ${moduleName}:`, e.message);
+				return;
+			}
 			let m = new Module();
 
 			if (m.requiresVersion) {
@@ -255,19 +292,27 @@ function App () {
 
 		Log.setLogLevel(config.logLevel);
 
+		// get the used module positions
+		Utils.getModulePositions();
+
 		let modules = [];
 		for (const module of config.modules) {
 			if (module.disabled) continue;
 			if (module.module) {
 				if (Utils.moduleHasValidPosition(module.position) || typeof (module.position) === "undefined") {
-					modules.push(module.module);
+					// Only add this module to be loaded if it is not a duplicate (repeated instance of the same module)
+					if (!modules.includes(module.module)) {
+						modules.push(module.module);
+					}
 				} else {
-					Log.warn("Invalid module position found for this configuration:", module);
+					Log.warn("Invalid module position found for this configuration:" + `\n${JSON.stringify(module, null, 2)}`);
 				}
 			} else {
-				Log.warn("No module name found for this configuration:", module);
+				Log.warn("No module name found for this configuration:" + `\n${JSON.stringify(module, null, 2)}`);
 			}
 		}
+
+		setGlobalDispatcher(new Agent({ connect: { timeout: fetch_timeout } }));
 
 		await loadModules(modules);
 
@@ -319,7 +364,7 @@ function App () {
 				}
 			} catch (error) {
 				Log.error(`Error when stopping node_helper for module ${nodeHelper.name}:`);
-				console.error(error);
+				Log.error(error);
 			}
 		}
 

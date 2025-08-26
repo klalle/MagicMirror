@@ -1,9 +1,12 @@
-/* MagicMirror² Test config for fullday calendar entries over multiple days
+/*
+ * MagicMirror² Test config for fullday calendar entries over multiple days
  *
  * By Paranoid93 https://github.com/Paranoid93/
  * MIT Licensed.
  */
 let config = {
+	address: "0.0.0.0",
+	ipWhitelist: [],
 	timeFormat: 12,
 
 	modules: [

@@ -1,6 +1,7 @@
 /* global WeatherProvider, WeatherObject */
 
-/* This class is a provider for Open-Meteo,
+/*
+ * This class is a provider for Open-Meteo,
  * see https://open-meteo.com/
  */
 
@@ -9,8 +10,11 @@ const GEOCODE_BASE = "https://api.bigdatacloud.net/data/reverse-geocode-client";
 const OPEN_METEO_BASE = "https://api.open-meteo.com/v1";
 
 WeatherProvider.register("openmeteo", {
-	// Set the name of the provider.
-	// Not strictly required, but helps for debugging.
+
+	/*
+	 * Set the name of the provider.
+	 * Not strictly required, but helps for debugging.
+	 */
 	providerName: "Open-Meteo",
 
 	// Set the default config properties that is specific to this provider
@@ -240,17 +244,17 @@ WeatherProvider.register("openmeteo", {
 			.add(Math.max(0, Math.min(7, this.config.maxNumberOfDays)), "days")
 			.endOf("day");
 
-		params["start_date"] = startDate.format("YYYY-MM-DD");
+		params.start_date = startDate.format("YYYY-MM-DD");
 
 		switch (this.config.type) {
 			case "hourly":
 			case "daily":
 			case "forecast":
-				params["end_date"] = endDate.format("YYYY-MM-DD");
+				params.end_date = endDate.format("YYYY-MM-DD");
 				break;
 			case "current":
-				params["current_weather"] = true;
-				params["end_date"] = params["start_date"];
+				params.current_weather = true;
+				params.end_date = params.start_date;
 				break;
 			default:
 				// Failsafe
@@ -258,7 +262,7 @@ WeatherProvider.register("openmeteo", {
 		}
 
 		return Object.keys(params)
-			.filter((key) => (params[key] ? true : false))
+			.filter((key) => (!!params[key]))
 			.map((key) => {
 				switch (key) {
 					case "hourly":
@@ -466,7 +470,7 @@ WeatherProvider.register("openmeteo", {
 			61: "rain-slight-intensity",
 			63: "rain-moderate-intensity",
 			65: "rain-heavy-intensity",
-			66: "freezing-rain-light-heavy-intensity",
+			66: "freezing-rain-light-intensity",
 			67: "freezing-rain-heavy-intensity",
 			71: "snow-fall-slight-intensity",
 			73: "snow-fall-moderate-intensity",
